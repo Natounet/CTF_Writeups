@@ -1,6 +1,6 @@
 # CTF - Vulnversity / Tryhackme
 
-1. Recon
+# 1. Recon
 
 Nmap result :
 
@@ -22,7 +22,7 @@ port 139/445 run a samba server, using the enum4linux script, we can discover a 
 
 
 
-2. Web
+# 2. Web
 
 The main website is running on port 3333, it's a replication of a university website.
 Using gobuster, we can find thoses directories :
@@ -47,13 +47,13 @@ With a listener in place, we can catch our reverse and connect in the www-data u
 
 
 
-3. Exploration
+# 3. Exploration
 
 Navigating on the system, we can access the home directory of the bill user. Where we can find the user.txt
 
 It's now time to search for a privesc. After investigating crontab, sudo -l, ... we can find interesting SUID files
 
--> find / -perm -u=s 2> /dev/null
+> find / -perm -u=s 2> /dev/null
 
 /usr/lib/squid/pinger
 /bin/systemctl
@@ -64,7 +64,7 @@ will send us a root shell.
 
 
 
-4. Privesc
+# 4. Privesc
 
 We can use the method A1vinSmith : https://gist.github.com/A1vinSmith/78786df7899a840ec43c5ddecb6a4740
 First, we create our evil service
@@ -87,13 +87,13 @@ WantedBy=multi-user.target
 The ExecStart parameter is where you can set your command.
 Setup a listener then enable the servic
 If the path to systemctl is different, modify it.
--> /bin/systemctl enable /path/to/your/service/evil.service
+> /bin/systemctl enable /path/to/your/service/evil.service
 
--> /bin/systemctl start evil
+> /bin/systemctl start evil
 
 
 
-5. #Root
+# 5. Root
 
 Now we have root, we can access the /root/root.txt and get the flag.
 
