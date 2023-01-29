@@ -14,3 +14,6 @@ Liste des compte-rendu disponibles :
    9. [Skynet](https://github.com/Natounet/CTF_Writeups/blob/main/Skynet.pdf)
    10. [SteelMountain](https://github.com/Natounet/CTF_Writeups/blob/main/SteelMoutain.pdf)
    11. [Vulnversity](https://github.com/Natounet/CTF_Writeups/blob/main/Vulnversity.pdf)
+
+2. HackTheBox
+   1. [Ambassador](https://github.com/Natounet/CTF_Writeups/blob/main/Ambassador.pdf)
